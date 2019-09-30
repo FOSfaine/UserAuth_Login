@@ -1,57 +1,85 @@
-"use strict";
-var fs = require("fs");
-var path = require("path");
-var Sequelize= require('sequelize');
-
 const express = require('express');
 const expressLayouts = require('express-ejs-layouts');
+// const mongoose = require('mongoose');
+const passport = require('passport');
+const flash = require('connect-flash');
+const session = require('express-session');
 const app = express();
 
-//Middleware EJS
+var mysql = require("mysql2");
+var inquirer = require("inquirer");
+
+// Passport Config
+require('./config/passport')(passport);
+
+// DB Config
+
+// Connect to MongoDB
+// mongoose
+//   .connect(
+//     db,
+//     { useNewUrlParser: true }
+//   )
+//   .then(() => console.log('MongoDB Connected'))
+//   .catch(err => console.log(err));
+
+// Connect to MySql
+var connection = mysql.createConnection({
+    host: "localhost",
+  
+    // Your port; if not 3306
+    port: 3306,
+  
+    // Your username
+    user: "root",
+  
+    // Your password
+    password: "SerenCae@aol.com2019",
+    database: "blogger"
+  });
+  
+  //Connect to MySql
+  connection.connect(function(err) {
+    if (err) throw err;
+    // runSearch();
+    console.log("Connected to localhost 3306");
+  });
+
+// EJS
 app.use(expressLayouts);
 app.set('view engine', 'ejs');
 
-//Routes
-app.use('/', require('./routes/index'));
-app.use('/users', require('./routes/users'));
+// Express body parser
+app.use(express.urlencoded({ extended: false }));
 
-const PORT = process.env.PORT || 3306;
+// Express session
+app.use(
+  session({
+    secret: 'secret',
+    resave: true,
+    saveUninitialized: true
+  })
+);
 
-app.listen(PORT, console.log('Server started on port ${PORT}'));
+// Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
 
+// Connect flash
+app.use(flash());
 
-var basename = path.basename(module.filename);
+// Global variables
+app.use(function(req, res, next) {
+  res.locals.success_msg = req.flash('success_msg');
+  res.locals.error_msg = req.flash('error_msg');
+  res.locals.error = req.flash('error');
+  next();
+});
 
-var env = process.env.NODE_ENV || "development";
+// Routes
+app.use('/', require('./routes/index.js'));
+app.use('/users', require('./routes/users.js'));
 
-//DB Config
-var config = require(__dirname + "/../config/config.json")[env];
-var db = {};
+const PORT = process.env.PORT || 5000;
 
-// if (config.use_env_variable) {
-//     var sequelize = new Sequelize(process.env[config.use_env_variable]);
-//   } else {
-//     var sequelize = new Sequelize(config.database, config.username, config.password, config);
-//   }
-
-//   fs
-//   .readdirSync(__dirname)
-//   .filter(function(file) {
-//     return (file.indexOf(".") !== 0) && (file !== basename) && (file.slice(-3) === ".js");
-//   })
-//   .forEach(function(file) {
-//     var model = sequelize["import"](path.join(__dirname, file));
-//     db[model.name] = model;
-//   });
-
-// Object.keys(db).forEach(function(modelName) {
-//   if (db[modelName].associate) {
-//     db[modelName].associate(db);
-//   }
-// });
-
-// db.sequelize = sequelize;
-// db.Sequelize = Sequelize;
-
-
-module.exports = db;
+app.listen(PORT, console.log(`Server started on port ${PORT}`));
