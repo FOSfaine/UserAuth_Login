@@ -1,4 +1,5 @@
 module.exports = {
+  //Can bring this in and add this as middleware to any route that we want to be protected
     ensureAuthenticated: function(req, res, next) {
       if (req.isAuthenticated()) {
         return next();

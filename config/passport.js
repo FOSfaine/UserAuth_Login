@@ -1,5 +1,6 @@
+var passport = require("passport");
+var sequelize = require("sequelize");
 const LocalStrategy = require('passport-local').Strategy;
-// const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
 // Load User model
@@ -25,17 +26,20 @@ module.exports = function(passport) {
             return done(null, false, { message: 'Password incorrect' });
           }
         });
-      });
+      })
+      .catch(err => console.log(err));
     })
   );
 
-  passport.serializeUser(function(user, done) {
+  passport.serializeUser((user, done) => {
     done(null, user.id);
   });
-
-  passport.deserializeUser(function(id, done) {
-    User.findById(id, function(err, user) {
+  
+  passport.deserializeUser((id, done) => {
+    User.findById(id, (err, user) => {
       done(err, user);
-    });
+    })
   });
-};
+
+}
+

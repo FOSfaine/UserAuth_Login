@@ -7,33 +7,17 @@ const session = require('express-session');
 const app = express();
 
 var mysql = require("mysql2");
+var sequelize = require("sequelize");
 var inquirer = require("inquirer");
 
 // Passport Config
 require('./config/passport')(passport);
 
-// DB Config
-
-// Connect to MongoDB
-// mongoose
-//   .connect(
-//     db,
-//     { useNewUrlParser: true }
-//   )
-//   .then(() => console.log('MongoDB Connected'))
-//   .catch(err => console.log(err));
-
 // Connect to MySql
 var connection = mysql.createConnection({
     host: "localhost",
-  
-    // Your port; if not 3306
     port: 3306,
-  
-    // Your username
     user: "root",
-  
-    // Your password
     password: "SerenCae@aol.com2019",
     database: "blogger"
   });
@@ -41,7 +25,6 @@ var connection = mysql.createConnection({
   //Connect to MySql
   connection.connect(function(err) {
     if (err) throw err;
-    // runSearch();
     console.log("Connected to localhost 3306");
   });
 
@@ -52,7 +35,7 @@ app.set('view engine', 'ejs');
 // Express body parser
 app.use(express.urlencoded({ extended: false }));
 
-// Express session
+// Express session middleware
 app.use(
   session({
     secret: 'secret',
@@ -68,7 +51,7 @@ app.use(passport.session());
 // Connect flash
 app.use(flash());
 
-// Global variables
+// Global variables (adding our own custom middleware)
 app.use(function(req, res, next) {
   res.locals.success_msg = req.flash('success_msg');
   res.locals.error_msg = req.flash('error_msg');
