@@ -1,17 +1,15 @@
-var passport = require("passport");
-var sequelize = require("sequelize");
 const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcryptjs');
 
 // Load User model
-const User = require('../models/User');
+const db = require('../models');
 
 module.exports = function(passport) {
   passport.use(
     new LocalStrategy({ usernameField: 'email' }, (email, password, done) => {
-      // Match user
-      User.findOne({
-        email: email
+      // Match 
+      db.User.findOne({
+        where: {email: email}
       }).then(user => {
         if (!user) {
           return done(null, false, { message: 'That email is not registered' });
@@ -36,8 +34,10 @@ module.exports = function(passport) {
   });
   
   passport.deserializeUser((id, done) => {
-    User.findById(id, (err, user) => {
-      done(err, user);
+    db.User.findOne({
+      where: { id: id }
+    }).then (res => {
+    done(null, res.id);
     })
   });
 

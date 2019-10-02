@@ -1,14 +1,14 @@
 const express = require('express');
 const expressLayouts = require('express-ejs-layouts');
-// const mongoose = require('mongoose');
 const passport = require('passport');
 const flash = require('connect-flash');
 const session = require('express-session');
 const app = express();
 
 var mysql = require("mysql2");
-var sequelize = require("sequelize");
-var inquirer = require("inquirer");
+
+// Requiring our models for syncing
+var db = require("./models/User");
 
 // Passport Config
 require('./config/passport')(passport);
@@ -64,5 +64,12 @@ app.use('/', require('./routes/index.js'));
 app.use('/users', require('./routes/users.js'));
 
 const PORT = process.env.PORT || 5000;
+
+// Syncing our sequelize models and starting Express app
+// db.sequelize.sync({ force: true }).then(function() {
+//   app.listen(PORT, function() {
+//     console.log("App listening on PORT " + PORT);
+//   });
+// });
 
 app.listen(PORT, console.log(`Server started on port ${PORT}`));
