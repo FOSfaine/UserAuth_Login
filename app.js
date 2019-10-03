@@ -8,7 +8,7 @@ const app = express();
 var mysql = require("mysql2");
 
 // Requiring our models for syncing
-var db = require("./models/User");
+var db = require("./models");
 
 // Passport Config
 require('./config/passport')(passport);
@@ -26,7 +26,7 @@ var connection = mysql.createConnection({
   connection.connect(function(err) {
     if (err) throw err;
     console.log("Connected to localhost 3306");
-  });
+  }); 
 
 // EJS
 app.use(expressLayouts);
